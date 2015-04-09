@@ -48,25 +48,41 @@ angular.module('raffle_maker')
 	}
 
 	$scope.raffle = function() {
-		if ($scope.members.length > 0) {
+		if ($scope.members.length > 1) {
 			RandomService.getRandom(1, $scope.members.length).then(
 				function(result) {
 					$scope.vars.winner.name = $scope.members[result.data-1].name;
-					$scope.vars.winner.twitter = $scope.members[result.data-1].twitter || '';
-					$scope.vars.winner.photo = $scope.members[result.data-1].photo || CONFIG.DEFAULT_PHOTO;
+					$scope.vars.winner.twitter = $scope.members[result.data-1].twitter;
+					$scope.vars.winner.photo = $scope.members[result.data-1].photo;
 					$log.debug(result.data
 						+ $scope.vars.winner.name + '/'
 						+ $scope.vars.winner.twitter + '/'
 						+ $scope.vars.winner.photo
 					);
-					$('#winnerModal').modal();
+					$('#winnerModal').modal({backdrop:'static'});
 				},
 				function() {
 					alert("Could't get a random number :(");
 				}
 			);
 		} else {
-			alert('Cannot raffle if there are no members!!');
+			if ($scope.members.length == 1) {
+				alert("You can't make a raffle with just one member!!");
+			} else {
+				alert('Cannot raffle if there are no members!!');
+			}
+		}
+	};
+
+	$scope.removeAttendee = function(attendee) {
+		var index = -1;
+		angular.forEach($scope.members, function(member, idx) {
+			if (member.id == attendee.id) {
+				index = idx;
+			}
+		});
+		if (index >= 0) {
+			$scope.members.splice(index, 1);
 		}
 	};
 }]);

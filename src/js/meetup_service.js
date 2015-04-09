@@ -26,6 +26,7 @@ angular.module('raffle_maker')
 		var params = {
 			'group_urlname': group,
 			'page': CONFIG.PAGE_COUNT,
+			'status': 'upcoming,past',
 			'access_token': AuthService.getAccessToken()
 		};
 		promiseWhile(
@@ -66,9 +67,14 @@ angular.module('raffle_maker')
 					if (item.member_photo) {
 						member.photo = item.member_photo.photo_link;
 						member.thumb = item.member_photo.thumb_link;
+					} else {
+						member.photo = CONFIG.DEFAULT_PHOTO;
+						member.thumb = CONFIG.DEFAULT_THUMB;
 					}
 					if (item.member.other_services && item.member.other_services.twitter && item.member.other_services.twitter.identifier) {
 						member.twitter = item.member.other_services.twitter.identifier;
+					} else {
+						member.twitter = 'Not available';
 					}
 					rsvp.push(member);
 				});
