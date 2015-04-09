@@ -1,27 +1,72 @@
 'use strict';
 
 angular.module('raffle_maker')
-.controller('RaffleController', ['$scope', 'MeetupService', function($scope, MeetupService) {
+.controller('RaffleController', ['$scope', 'MeetupService', 'RandomService', 'CONFIG', '$log', function($scope, MeetupService, RandomService, CONFIG, $log) {
 	$scope.vars = {
-		api_key: '',
-		group_name: ''
+		access_token: '',
+		group_name: 'MalagaMakers',
+		event_id: '',
+		winner: {
+			name: '',
+			twitter: '',
+			photo: ''
+		}
 	};
 	$scope.events = [];
 	$scope.members = [];
 
+	function shuffle(o) {
+    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+		return o;
+	};
+
 	$scope.fetchEvents = function() {
-		if ($scope.vars.api_key.length > 0 && $scope.vars.group_name.length > 0) {
-			MeetupService.getEvents($scope.vars.api_key, $scope.vars.group_name).then(function(events) {
+		if ($scope.vars.group_name.length > 0) {
+			MeetupService.getEvents($scope.vars.access_token, $scope.vars.group_name).then(function(events) {
 				$scope.events.splice(0, $scope.events.length);
 				angular.forEach(events, function(item) {
 					$scope.events.push(item);
 				});
 			});
 		} else {
-			alert('You must enter your Meetup API key and the group name');
+			alert("You must enter the group's URL name");
 		}
 	};
 
 	$scope.fetchMembers = function() {
+		if ($scope.vars.event_id != '') {
+			MeetupService.getRsvp($scope.vars.access_token, $scope.vars.event_id).then(function(members) {
+				$scope.members.splice(0, $scope.members.length);
+				var members_shuffled = shuffle(members);
+				angular.forEach(members, function(item) {
+					$scope.members.push(item);
+				});
+			});
+		} else {
+			alert('You must select an event');
+		}
+	}
+
+	$scope.raffle = function() {
+		if ($scope.members.length > 0) {
+			RandomService.getRandom(1, $scope.members.length).then(
+				function(result) {
+					$scope.vars.winner.name = $scope.members[result.data-1].name;
+					$scope.vars.winner.twitter = $scope.members[result.data-1].twitter || '';
+					$scope.vars.winner.photo = $scope.members[result.data-1].photo || CONFIG.DEFAULT_PHOTO;
+					$log.debug(result.data
+						+ $scope.vars.winner.name + '/'
+						+ $scope.vars.winner.twitter + '/'
+						+ $scope.vars.winner.photo
+					);
+					$('#winnerModal').modal();
+				},
+				function() {
+					alert("Could't get a random number :(");
+				}
+			);
+		} else {
+			alert('Cannot raffle if there are no members!!');
+		}
 	};
 }]);

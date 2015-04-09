@@ -9,28 +9,80 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 	</head>
 	<body ng-controller="RaffleController">
-		<div>
-			<input type="text" ng-model="vars.group_name" placeholder="Group URL name">
+		<div class="modal fade" id="winnerModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+						<h4 class="modal-title" if="winnerModalLabel">And the winner is...</h4>
+					</div>
+					<div class="modal-body">
+						<h4>{{vars.winner.name}} / {{vars.winner.twitter}}</h4>
+						<img ng-src="{{vars.winner.photo}}">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
 		</div>
-		<button ng-click="fetchEvents()" class="btn btn-info">Fetch events</button>
-		<table class="table table-striped table-hover">
-			<thead>
-				<th></th>
-				<th>Event name</th>
-			</thead>
-			<tbody>
-				<tr ng-repeat="event in events">
-					<td><input type="radio" name="event" ng-model="event.sel"></td>
-					<td>{{event.name}}</td>
-				</tr>
-			</tbody>
-		</table>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<input type="text" ng-model="vars.group_name" placeholder="Group URL name">
+					<button ng-click="fetchEvents()" class="btn btn-info">Fetch events</button>
+					<a href="index.html" class="btn btn-danger">Reauth</a>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table table-striped table-hover table-bordered">
+						<thead>
+							<th>Event name</th>
+						</thead>
+						<tbody>
+							<tr ng-repeat="event in events">
+								<td>
+									<label><input type="radio" name="event" id="event" ng-model="vars.event_id" value="{{event.id}}">&nbsp;{{event.name}}</label>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<button class="btn btn-info" ng-click="fetchMembers()">Fetch members</button>
+					<button class="btn btn-success" ng-click="raffle()">Raffle!</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table table-striped table-hoveri table-bordered">
+						<thead>
+							<th>Photo</th>
+							<th>Member name</th>
+							<th>Twitter handle</td>
+						</thead>
+						<tbody>
+							<tr ng-repeat="member in members">
+								<td><img ng-src="{{member.thumb}}"></td>
+								<td>{{member.name}}</td>
+								<td>{{member.twitter}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-route.min.js"></script>
 		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/meetup_service.js"></script>
+		<script type="text/javascript" src="js/auth_service.js"></script>
+		<script type="text/javascript" src="js/random_service.js"></script>
 		<script type="text/javascript" src="js/ready_controller.js"></script>
 	</body>
 </html>
